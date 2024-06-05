@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ScrollView } from "react-native-gesture-handler";
+
 export default function Dashboard() {
   const navigation = useNavigation();
   const windowWidth = Dimensions.get("window").width;
@@ -21,13 +22,6 @@ export default function Dashboard() {
     AnnualIncrement: "",
   });
 
-  calculateSIP(
-    Number(formData.monthlyInvestment),
-    Number(formData.AnnualIncrement),
-    Number(formData.RateOfReturn),
-    Number(formData.periodInYear),
-    Number(formData.periodInMonth)
-  );
   function calculateSIP(
     initialSIP,
     annualIncrease,
@@ -50,7 +44,6 @@ export default function Dashboard() {
     }
 
     // Calculate for additional months
-
     const yearlySIP = initialSIP + totalYears * annualIncrease;
     for (let month = 1; month <= additionalMonths; month++) {
       totalAmount = (totalAmount + yearlySIP) * (1 + monthlyRate);
@@ -63,6 +56,7 @@ export default function Dashboard() {
       wealthGain: (totalAmount - investedAmount).toFixed(2),
     };
   }
+
   let result = calculateSIP(
     Number(formData.monthlyInvestment),
     Number(formData.AnnualIncrement),
@@ -70,20 +64,16 @@ export default function Dashboard() {
     Number(formData.periodInYear),
     Number(formData.periodInMonth)
   );
+
   function formatPriceInLacsCrores(price) {
-    // Check if the input is a valid number
     if (isNaN(price)) {
       return "Invalid Price";
     }
 
-    // Convert the price to absolute value (handle negative numbers)
     const absPrice = Math.abs(price);
-
-    // Define the conversion thresholds
     const croreThreshold = 10000000; // 1 Crore
     const lakhThreshold = 100000; // 1 Lakh
 
-    // Determine the appropriate unit
     let unit;
     let formattedPrice;
     if (absPrice >= croreThreshold) {
@@ -94,275 +84,171 @@ export default function Dashboard() {
       unit = "Lakhs";
     } else {
       formattedPrice = absPrice.toFixed(2);
-      unit = ""; // No unit for smaller values
+      unit = "";
     }
 
-    // Combine formatted price and unit
     return `${formattedPrice} ${unit}`;
   }
 
   return (
-    <View style={{ marginHorizontal: 20 }}>
-      <View style={{display:"flex", flexDirection:"row"}}>
-      <Pressable
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        {/* <Pressable
           onPress={() => {
             navigation.openDrawer();
             // navigation.closeDrawer();
           }}
-          style={{
-           
-            paddingTop: 20,
-            // backgroundColor: "aqua",
-            width: 40,
-            display: "flex",
-            flexDirection:"row",
-            justifyContent:"center"
-            ,
-            
-          }}
+          style={styles.menuButton}
         >
           <Text>
             {" "}
             <Ionicons name="menu-outline" size={25} color="black" />
           </Text>
-        </Pressable>
-        <View style={{ marginTop: 20, marginBottom: 20 ,  marginLeft:30 }}>
-          <Text
-            style={{ textAlign: "center", fontSize: 20, fontWeight: "600" }}
-          >
-            Expected Amount{" "}
-          </Text>
-          <Text style={[styles.gain]}>
-            {formatPriceInLacsCrores(result.totalAmount)}
-          </Text>
+        </Pressable> */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Expected Amount{" "}</Text>
+          <Text style={styles.gain}>{formatPriceInLacsCrores(result.totalAmount)}</Text>
         </View>
       </View>
-        <View
-          style={{
-            marginTop: 5,
-            marginBottom: 30,
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-around",
-          }}
-        >
-          <View>
-            <Text style={{ fontSize: 15, fontWeight: "600" }}>
-              Amount Invested
-            </Text>
-            <Text style={styles.gain}>
-              {formatPriceInLacsCrores(result.investedAmount)}
-            </Text>
-          </View>
-          <View>
-            <Text style={{ fontSize: 15, fontWeight: "600" }}>
-              Wealth Gained
-            </Text>
-            <Text style={styles.gain}>
-              {formatPriceInLacsCrores(result.wealthGain)}
-            </Text>
-          </View>
-        </View>
-        {/* first section */}
-
-        {/* second section  */}
-
+      <View style={styles.resultContainer}>
         <View>
-          <View>
-            <Text
-              style={{
-                fontWeight: "600",
-                fontSize: 20,
-                lineHeight: 20,
-                marginBottom: 10,
-                color: "#666666",
-              }}
-            >
-              Investment period (year)
-            </Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              onChangeText={(e) =>
-                setFormData({ ...formData, periodInYear: e.trim() })
-              }
-              value={formData.periodInYear}
-              placeholder="Enter period in year"
-            />
-          </View>
-          <View>
-            <Text
-              style={{
-                fontWeight: "600",
-                fontSize: 20,
-                lineHeight: 20,
-                marginBottom: 10,
-                color: "#666666",
-              }}
-            >
-              Investment period (month)
-            </Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              onChangeText={(e) =>
-                setFormData({ ...formData, periodInMonth: e.trim() })
-              }
-              value={formData.periodInMonth}
-              placeholder="Enter period in month"
-            />
-          </View>
-
-          <View>
-            <Text
-              style={{
-                fontWeight: "600",
-                fontSize: 20,
-                lineHeight: 20,
-                marginBottom: 10,
-                color: "#666666",
-              }}
-            >
-              Expected Annual returns
-            </Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              onChangeText={(e) =>
-                setFormData({ ...formData, RateOfReturn: e.trim() })
-              }
-              value={formData.RateOfReturn}
-              placeholder="Enter Expected Annual returns"
-            />
-          </View>
-
-          <View>
-            <Text
-              style={{
-                fontWeight: "600",
-                fontSize: 20,
-                lineHeight: 20,
-                marginBottom: 10,
-                color: "#666666",
-              }}
-            >
-              Monthly Investment
-            </Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              onChangeText={(e) =>
-                setFormData({ ...formData, monthlyInvestment: e.trim() })
-              }
-              value={formData.monthlyInvestment}
-              placeholder="Enter monthly Investment"
-            />
-          </View>
-
-          <View>
-            <Text
-              style={{
-                fontWeight: "600",
-                fontSize: 20,
-                lineHeight: 20,
-                marginBottom: 10,
-                color: "#666666",
-              }}
-            >
-              Annual Increment
-            </Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              onChangeText={(e) =>
-                setFormData({ ...formData, AnnualIncrement: e.trim() })
-              }
-              value={formData.AnnualIncrement}
-              placeholder="Enter Annual Increment"
-            />
-          </View>
-
-          <View
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              flexDirection: "row",
-              marginHorizontal: 20,
-            }}
-          >
-            <Pressable
-              style={{
-                backgroundColor: "#0D88C3",
-                height: 45,
-                width: windowWidth / 1.15,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: 15,
-                borderWidth: 1,
-                borderColor: "grey",
-              }}
-              onPress={() =>
-                calculateSIP(
-                  Number(formData.monthlyInvestment),
-                  Number(formData.AnnualIncrement),
-                  Number(formData.RateOfReturn),
-                  Number(formData.periodInYear),
-                  Number(formData.periodInMonth)
-                )
-              }
-            >
-              <Text style={{ color: "#ffff", fontWeight: "800" }}>
-                Check Gain
-              </Text>
-            </Pressable>
-          </View>
+          <Text style={styles.subTitle}>Amount Invested</Text>
+          <Text style={styles.gain}>{formatPriceInLacsCrores(result.investedAmount)}</Text>
+        </View>
+        <View>
+          <Text style={styles.subTitle}>Wealth Gained</Text>
+          <Text style={styles.gain}>{formatPriceInLacsCrores(result.wealthGain)}</Text>
         </View>
       </View>
+      <View>
+        <View>
+          <Text style={styles.label}>Investment period (year)</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            onChangeText={(e) =>
+              setFormData({ ...formData, periodInYear: e.trim() })
+            }
+            value={formData.periodInYear}
+            placeholder="Enter period in year"
+          />
+        </View>
+        <View>
+          <Text style={styles.label}>Investment period (month)</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            onChangeText={(e) =>
+              setFormData({ ...formData, periodInMonth: e.trim() })
+            }
+            value={formData.periodInMonth}
+            placeholder="Enter period in month"
+          />
+        </View>
+        <View>
+          <Text style={styles.label}>Expected Annual returns</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            onChangeText={(e) =>
+              setFormData({ ...formData, RateOfReturn: e.trim() })
+            }
+            value={formData.RateOfReturn}
+            placeholder="Enter Expected Annual returns"
+          />
+        </View>
+        <View>
+          <Text style={styles.label}>Monthly Investment</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            onChangeText={(e) =>
+              setFormData({ ...formData, monthlyInvestment: e.trim() })
+            }
+            value={formData.monthlyInvestment}
+            placeholder="Enter monthly Investment"
+          />
+        </View>
+        <View>
+          <Text style={styles.label}>Annual Increment</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            onChangeText={(e) =>
+              setFormData({ ...formData, AnnualIncrement: e.trim() })
+            }
+            value={formData.AnnualIncrement}
+            placeholder="Enter Annual Increment"
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <Pressable
+            style={[styles.button, { width: windowWidth / 1.15 }]}
+            onPress={() =>
+              calculateSIP(
+                Number(formData.monthlyInvestment),
+                Number(formData.AnnualIncrement),
+                Number(formData.RateOfReturn),
+                Number(formData.periodInYear),
+                Number(formData.periodInMonth)
+              )
+            }
+          >
+            <Text style={styles.buttonText}>Check Gain</Text>
+          </Pressable>
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gain: { fontSize: 20, fontWeight: "800", textAlign: "center" },
-  main: {
-    flex: 1,
+  container: {
+    marginHorizontal: 20,
+  },
+  headerContainer: {
+    display: "flex",
+    flexDirection: "row",
     justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
+  },
+  menuButton: {
+    paddingTop: 20,
+    width: 40,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  titleContainer: {
+    marginTop: 20,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 64,
-    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "600",
   },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
+  gain: {
+    fontSize: 20,
+    fontWeight: "800",
+    textAlign: "center",
   },
-  button: {
-    backgroundColor: "#0D88C3",
-    height: 45,
-    width: 70,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 15,
-    // borderWidth: 1,
-    margin: 2,
-  },
-  flex: {
+  resultContainer: {
+    marginTop: 5,
+    marginBottom: 30,
     display: "flex",
-    // justifyContent: "space-between",
     flexDirection: "row",
-    marginHorizontal: 5,
-    // marginVertical:15,
+    justifyContent: "space-around",
   },
-  year: {
-    // backgroundColor: "#0D88C3",
-    height: 45,
-    width: 70,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 15,
-    // borderWidth: 1,
-    margin: 2,
+  subTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  label: {
+    fontWeight: "600",
+    fontSize: 20,
+    lineHeight: 20,
+    marginBottom: 10,
+    color: "#666666",
   },
   input: {
     width: "100%",
@@ -373,5 +259,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 20,
     color: "#666666",
+  },
+  buttonContainer: {
+    display: "flex",
+    justifyContent: "center",
+    flexDirection: "row",
+    marginHorizontal: 20,
+  },
+  button: {
+    backgroundColor: "#0D88C3",
+    height: 45,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "grey",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "800",
   },
 });
