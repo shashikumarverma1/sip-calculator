@@ -18,9 +18,7 @@ export default function Page() {
     monthlyInvestment: "",
     AnnualIncrement: "",
   });
-  const handalReturn = () => {
- 
-  };
+  
   calculateSIP(
     Number(formData.monthlyInvestment),
     Number(formData.AnnualIncrement),
