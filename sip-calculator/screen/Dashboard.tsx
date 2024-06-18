@@ -7,9 +7,11 @@ import {
   Text,
   TextInput,
   View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ScrollView } from "react-native-gesture-handler";
 
 export default function Dashboard() {
   const navigation = useNavigation();
@@ -91,120 +93,100 @@ export default function Dashboard() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        {/* <Pressable
-          onPress={() => {
-            navigation.openDrawer();
-            // navigation.closeDrawer();
-          }}
-          style={styles.menuButton}
-        >
-          <Text>
-            {" "}
-            <Ionicons name="menu-outline" size={25} color="black" />
-          </Text>
-        </Pressable> */}
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Expected Amount{" "}</Text>
-          <Text style={styles.gain}>{formatPriceInLacsCrores(result.totalAmount)}</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.headerContainer}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Expected Amount{" "}</Text>
+            <Text style={styles.gain}>{formatPriceInLacsCrores(result.totalAmount)}</Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.resultContainer}>
-        <View>
-          <Text style={styles.subTitle}>Amount Invested</Text>
-          <Text style={styles.gain}>{formatPriceInLacsCrores(result.investedAmount)}</Text>
+        <View style={styles.resultContainer}>
+          <View>
+            <Text style={styles.subTitle}>Amount Invested</Text>
+            <Text style={styles.gain}>{formatPriceInLacsCrores(result.investedAmount)}</Text>
+          </View>
+          <View>
+            <Text style={styles.subTitle}>Wealth Gained</Text>
+            <Text style={styles.gain}>{formatPriceInLacsCrores(result.wealthGain)}</Text>
+          </View>
         </View>
         <View>
-          <Text style={styles.subTitle}>Wealth Gained</Text>
-          <Text style={styles.gain}>{formatPriceInLacsCrores(result.wealthGain)}</Text>
+          <View>
+            <Text style={styles.label}>Investment period (year)</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              onChangeText={(e) =>
+                setFormData({ ...formData, periodInYear: e.trim() })
+              }
+              value={formData.periodInYear}
+              placeholder="Enter period in year"
+            />
+          </View>
+          <View>
+            <Text style={styles.label}>Investment period (month)</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              onChangeText={(e) =>
+                setFormData({ ...formData, periodInMonth: e.trim() })
+              }
+              value={formData.periodInMonth}
+              placeholder="Enter period in month"
+            />
+          </View>
+          <View>
+            <Text style={styles.label}>Expected Annual returns</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              onChangeText={(e) =>
+                setFormData({ ...formData, RateOfReturn: e.trim() })
+              }
+              value={formData.RateOfReturn}
+              placeholder="Enter Expected Annual returns"
+            />
+          </View>
+          <View>
+            <Text style={styles.label}>Monthly Investment</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              onChangeText={(e) =>
+                setFormData({ ...formData, monthlyInvestment: e.trim() })
+              }
+              value={formData.monthlyInvestment}
+              placeholder="Enter monthly Investment"
+            />
+          </View>
+          <View>
+            <Text style={styles.label}>Annual Increment</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              onChangeText={(e) =>
+                setFormData({ ...formData, AnnualIncrement: e.trim() })
+              }
+              value={formData.AnnualIncrement}
+              placeholder="Enter Annual Increment"
+            />
+          </View>
+         
         </View>
-      </View>
-      <View>
-        <View>
-          <Text style={styles.label}>Investment period (year)</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            onChangeText={(e) =>
-              setFormData({ ...formData, periodInYear: e.trim() })
-            }
-            value={formData.periodInYear}
-            placeholder="Enter period in year"
-          />
-        </View>
-        <View>
-          <Text style={styles.label}>Investment period (month)</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            onChangeText={(e) =>
-              setFormData({ ...formData, periodInMonth: e.trim() })
-            }
-            value={formData.periodInMonth}
-            placeholder="Enter period in month"
-          />
-        </View>
-        <View>
-          <Text style={styles.label}>Expected Annual returns</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            onChangeText={(e) =>
-              setFormData({ ...formData, RateOfReturn: e.trim() })
-            }
-            value={formData.RateOfReturn}
-            placeholder="Enter Expected Annual returns"
-          />
-        </View>
-        <View>
-          <Text style={styles.label}>Monthly Investment</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            onChangeText={(e) =>
-              setFormData({ ...formData, monthlyInvestment: e.trim() })
-            }
-            value={formData.monthlyInvestment}
-            placeholder="Enter monthly Investment"
-          />
-        </View>
-        <View>
-          <Text style={styles.label}>Annual Increment</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            onChangeText={(e) =>
-              setFormData({ ...formData, AnnualIncrement: e.trim() })
-            }
-            value={formData.AnnualIncrement}
-            placeholder="Enter Annual Increment"
-          />
-        </View>
-        <View style={styles.buttonContainer}>
-          <Pressable
-            style={[styles.button, { width: windowWidth / 1.15 }]}
-            onPress={() =>
-              calculateSIP(
-                Number(formData.monthlyInvestment),
-                Number(formData.AnnualIncrement),
-                Number(formData.RateOfReturn),
-                Number(formData.periodInYear),
-                Number(formData.periodInMonth)
-              )
-            }
-          >
-            <Text style={styles.buttonText}>Check Gain</Text>
-          </Pressable>
-        </View>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 20,
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   headerContainer: {
     display: "flex",
