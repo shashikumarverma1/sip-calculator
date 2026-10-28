@@ -1,4 +1,4 @@
-import { simulateFreedom, isFinanciallyFree, foreverCorpus, safeMonthlySpend } from './freedom';
+import { simulateFreedom, isFinanciallyFree, foreverCorpus, foreverCorpusWithInflation, safeMonthlySpend } from './freedom';
 
 describe('simulateFreedom', () => {
   it('matches the known example without inflation: ₹10L, 11%, ₹10K/month → 22y 9m', () => {
@@ -35,6 +35,21 @@ describe('foreverCorpus', () => {
     const corpus = foreverCorpus(11, 10000);
     expect(isFinanciallyFree(corpus, 11, 10000)).toBe(true);
     expect(isFinanciallyFree(corpus * 0.99, 11, 10000)).toBe(false);
+  });
+});
+
+describe('foreverCorpusWithInflation', () => {
+  it('matches the plain foreverCorpus when inflation is zero', () => {
+    expect(foreverCorpusWithInflation(11, 10000, 0)).toBeCloseTo(foreverCorpus(11, 10000), 2);
+  });
+
+  it('requires a bigger corpus than the non-inflation version once expenses grow', () => {
+    expect(foreverCorpusWithInflation(11, 10000, 6)).toBeGreaterThan(foreverCorpus(11, 10000));
+  });
+
+  it('is Infinity when inflation outpaces or matches the return', () => {
+    expect(foreverCorpusWithInflation(6, 10000, 6)).toBe(Infinity);
+    expect(foreverCorpusWithInflation(5, 10000, 6)).toBe(Infinity);
   });
 });
 

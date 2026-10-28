@@ -66,6 +66,18 @@ export function foreverCorpus(annualReturnPct: number, monthlyExpense: number): 
   return monthlyExpense / monthlyRate;
 }
 
+/**
+ * Corpus needed to sustain a monthly expense forever when the expense itself grows with
+ * inflation every year — a growing perpetuity: corpus = annualExpense / (returnRate - inflationRate).
+ * Returns Infinity when the return doesn't outpace inflation (never truly "free" at this expense).
+ * With inflationPct = 0 this is exactly equivalent to `foreverCorpus`.
+ */
+export function foreverCorpusWithInflation(annualReturnPct: number, monthlyExpense: number, inflationPct: number): number {
+  const netRate = (annualReturnPct - inflationPct) / 100;
+  if (netRate <= 0) return Infinity;
+  return (monthlyExpense * 12) / netRate;
+}
+
 /** Largest monthly spend that survives exactly `targetYears` years, given inflation. */
 export function safeMonthlySpend(
   corpus: number,
