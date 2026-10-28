@@ -1,15 +1,16 @@
 {
   "expo": {
-    "name": "sip-calculator",
+    "name": "JarUp",
     "slug": "sip-calculator",
     "version": "1.0.0",
+    "scheme": "jarup",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0f1420"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -22,7 +23,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.shashi.SipCalculator"
+      "package": "com.shashi.SipCalculator",
+      "edgeToEdgeEnabled": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
