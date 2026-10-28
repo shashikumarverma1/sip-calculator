@@ -27,8 +27,6 @@ export const TIERS: TierDef[] = [
   { radius: 44, value: 10_000_000, label: '1Cr' },
 ];
 
-export const MAX_BODIES = 180;
-
 export interface BallSnapshot {
   id: number;
   x: number;
@@ -90,9 +88,12 @@ export class PhysicsWorld {
     return body;
   }
 
-  /** Adds one ball of a tier at the top of the jar (or a given x), then checks for a merge. */
-  addBall(tier: number, color: BallColor, x?: number): BallBody | null {
-    if (this.ballBodies.size >= MAX_BODIES) return null;
+  /** Adds one ball of a tier at the top of the jar (or a given x), then checks for a merge:
+   * 10 same-tier same-color balls combine into 1 ball of the next tier up, so the jar always
+   * reflects a clean digit-decomposition of the running total (max 9 balls per tier per color)
+   * instead of growing without bound. There's still no cap on total balls — once there's more
+   * money than the jar can physically hold, balls pile up and spill out over the open top. */
+  addBall(tier: number, color: BallColor, x?: number): BallBody {
     const radius = TIERS[Math.min(tier, TIERS.length - 1)].radius;
     const px = x ?? radius + Math.random() * Math.max(this.jarWidth - radius * 2, 1);
     const body = this.createBallBody(tier, color, px, -radius * 2);
@@ -111,10 +112,8 @@ export class PhysicsWorld {
     });
     this.onMerge?.(tier, color);
     const nextTier = tier + 1;
-    if (this.ballBodies.size < MAX_BODIES) {
-      this.createBallBody(nextTier, color, x, y);
-      this.checkMerge(nextTier, color);
-    }
+    this.createBallBody(nextTier, color, x, y);
+    this.checkMerge(nextTier, color);
   }
 
   /** Converts a rupee amount into balls across tiers (base-10 digit decomposition in ₹1000 units) and drops them in. */

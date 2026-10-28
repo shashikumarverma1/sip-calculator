@@ -10,26 +10,30 @@ export interface JarHandle {
   removeAmount: (amount: number, color: BallColor) => void;
   reset: () => void;
   shake: () => void;
+  getBallCount: () => number;
 }
 
 export interface JarProps {
   width?: number;
   height?: number;
-  onMerge?: (tier: number, color: BallColor) => void;
   jarRef?: React.MutableRefObject<JarHandle | null>;
   /** 0..1 position of a dashed goal line from the bottom of the jar, if any. */
   goalLineRatio?: number;
 }
 
-export function Jar({ width = 300, height = 360, onMerge, jarRef, goalLineRatio }: JarProps) {
+/** Room above and beside the jar's own walls so overflow balls spilling out stay visible
+ * instead of being drawn past the edge of the canvas (which would just not render them). */
+const SPILL_MARGIN_TOP = 180;
+const SPILL_MARGIN_X = 60;
+
+export function Jar({ width = 300, height = 360, jarRef, goalLineRatio }: JarProps) {
   const [snapshot, setSnapshot] = useState<BallSnapshot[]>([]);
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const world = new PhysicsWorld(width, height);
-    world.onMerge = (tier, color) => {
+    world.onMerge = () => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-      onMerge?.(tier, color);
     };
 
     if (jarRef) {
@@ -38,6 +42,7 @@ export function Jar({ width = 300, height = 360, onMerge, jarRef, goalLineRatio 
         removeAmount: (amount, color) => world.removeAmount(amount, color),
         reset: () => world.reset(),
         shake: () => world.shake(),
+        getBallCount: () => world.ballBodies.size,
       };
     }
 
@@ -63,11 +68,13 @@ export function Jar({ width = 300, height = 360, onMerge, jarRef, goalLineRatio 
   }, [width, height]);
 
   const goalY = goalLineRatio != null ? height - goalLineRatio * height : null;
+  const canvasWidth = width + SPILL_MARGIN_X * 2;
+  const canvasHeight = height + SPILL_MARGIN_TOP;
 
   return (
-    <View style={[styles.wrapper, { width, height }]}>
+    <View style={{ width: canvasWidth, height: canvasHeight }}>
       <Canvas style={StyleSheet.absoluteFill}>
-        <Group>
+        <Group transform={[{ translateX: SPILL_MARGIN_X }, { translateY: SPILL_MARGIN_TOP }]}>
           <RoundedRect x={0} y={0} width={width} height={height} r={18} color="#15202e" />
           <RoundedRect x={2} y={2} width={width - 4} height={height - 4} r={16} style="stroke" strokeWidth={2} color="#2a3a52" />
           {snapshot.map((b) => (
@@ -81,10 +88,3 @@ export function Jar({ width = 300, height = 360, onMerge, jarRef, goalLineRatio 
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-    overflow: 'hidden',
-    borderRadius: 18,
-  },
-});
