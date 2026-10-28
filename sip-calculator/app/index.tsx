@@ -17,7 +17,7 @@ const TILES: CalcTile[] = [
   { href: '/sip', title: 'SIP', subtitle: 'Monthly investing, year by year', dots: [colors.blue, colors.gold] },
   { href: '/emi', title: 'EMI / Loan', subtitle: 'See the real interest you pay', dots: [colors.blue, colors.red] },
   { href: '/lumpsum', title: 'Lumpsum', subtitle: 'One drop, growing every year', dots: [colors.blue, colors.gold] },
-  { href: '/freedom', title: 'Freedom', subtitle: 'How long your money lasts', dots: [colors.gold, colors.red], pro: true },
+  { href: '/freedom', title: 'Financial Freedom', subtitle: 'How long your money lasts', dots: [colors.gold, colors.red], pro: true },
   { href: '/compare', title: 'Compare', subtitle: 'FD vs SIP jar race', dots: [colors.blue, colors.green], pro: true },
   { href: '/goal', title: 'Goal', subtitle: 'House, car, wedding target', dots: [colors.gold, colors.gold], pro: true },
 ];
