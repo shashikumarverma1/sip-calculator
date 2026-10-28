@@ -9,15 +9,22 @@ export interface CustomValueKeypadProps {
   min: number;
   max: number;
   allowDecimal?: boolean;
+  /** Adds a "00" key, handy for typing large rupee amounts quickly. */
+  doubleZero?: boolean;
+  /** Optional live preview under the typed value, e.g. a compact "₹2.75 L" readout of a raw amount. */
+  previewFormatter?: (value: number) => string;
+  /** Shown instead of the default "Allowed: min–max" hint when provided. */
+  hint?: string;
   onCancel: () => void;
   onSet: (value: number) => void;
 }
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'];
+const KEYS_DOUBLE_ZERO = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '00', '0', '⌫'];
 
 /** Full-screen numeric entry used by the "Other"/"Custom" chips — type a precise value instead
  * of dragging a slider or stepping through presets. */
-export function CustomValueKeypad({ title, suffix, initialValue, min, max, allowDecimal = true, onCancel, onSet }: CustomValueKeypadProps) {
+export function CustomValueKeypad({ title, suffix, initialValue, min, max, allowDecimal = true, doubleZero = false, previewFormatter, hint, onCancel, onSet }: CustomValueKeypadProps) {
   const [draft, setDraft] = useState(String(initialValue));
 
   const press = (key: string) => {
@@ -27,7 +34,7 @@ export function CustomValueKeypad({ title, suffix, initialValue, min, max, allow
     }
     if (key === '.' && (!allowDecimal || draft.includes('.'))) return;
     if (draft === '0' && key !== '.') {
-      setDraft(key);
+      setDraft(key.replace('00', '0'));
       return;
     }
     setDraft((d) => d + key);
@@ -43,10 +50,13 @@ export function CustomValueKeypad({ title, suffix, initialValue, min, max, allow
         {draft || '0'}
         <Text style={styles.suffix}> {suffix}</Text>
       </Text>
-      <Text style={styles.hint}>Allowed: {min}{suffix} to {max}{suffix}</Text>
+      {previewFormatter != null && !isNaN(parsed) && (
+        <Text style={styles.preview}>= {previewFormatter(parsed)}</Text>
+      )}
+      <Text style={styles.hint}>{hint ?? `Allowed: ${min}${suffix} to ${max}${suffix}`}</Text>
 
       <View style={styles.pad}>
-        {KEYS.map((k) => (
+        {(doubleZero ? KEYS_DOUBLE_ZERO : KEYS).map((k) => (
           <Pressable key={k} style={styles.key} onPress={() => press(k)}>
             <Text style={styles.keyText}>{k}</Text>
           </Pressable>
@@ -74,6 +84,7 @@ const styles = StyleSheet.create({
   title: { color: colors.textMuted, fontSize: 12, fontWeight: '800', textAlign: 'center', letterSpacing: 0.5, textTransform: 'uppercase' },
   value: { color: colors.text, fontSize: 36, fontWeight: '900', textAlign: 'center', marginTop: 10 },
   suffix: { color: colors.textFaint, fontSize: 18, fontWeight: '700' },
+  preview: { color: colors.gold, fontSize: 14, fontWeight: '800', textAlign: 'center', marginTop: 6 },
   hint: { color: colors.textFaint, fontSize: 12, textAlign: 'center', marginTop: 8, marginBottom: 32 },
   pad: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 14 },
   key: { width: '30%', paddingVertical: 18, borderRadius: 16, backgroundColor: colors.card, alignItems: 'center' },
