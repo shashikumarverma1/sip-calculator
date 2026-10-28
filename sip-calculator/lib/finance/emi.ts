@@ -61,3 +61,88 @@ export function computeEmiYearly(principal: number, annualRatePct: number, years
   }
   return result;
 }
+
+export interface PrepaymentResult {
+  months: number;
+  years: number;
+  remainderMonths: number;
+  totalInterest: number;
+  totalPayment: number;
+}
+
+/**
+ * Simulates paying the original EMI every month, plus an extra amount applied straight to
+ * principal (monthly and/or once a year), keeping the EMI fixed so the loan simply ends sooner.
+ */
+export function simulateEmiWithPrepayment(
+  principal: number,
+  annualRatePct: number,
+  years: number,
+  extraMonthly = 0,
+  extraYearly = 0,
+): PrepaymentResult {
+  const r = annualRatePct / 12 / 100;
+  const { emi, months: maxMonths } = computeEMI(principal, annualRatePct, years);
+  let balance = principal;
+  let totalInterest = 0;
+  let month = 0;
+  while (balance > 0 && month < maxMonths) {
+    month++;
+    const interest = balance * r;
+    const principalComponent = Math.min(emi - interest, balance);
+    totalInterest += interest;
+    balance -= principalComponent;
+    if (balance > 0) balance = Math.max(balance - extraMonthly, 0);
+    if (balance > 0 && month % 12 === 0) balance = Math.max(balance - extraYearly, 0);
+  }
+  return {
+    months: month,
+    years: Math.floor(month / 12),
+    remainderMonths: month % 12,
+    totalInterest,
+    totalPayment: principal + totalInterest,
+  };
+}
+
+export interface RecastResult {
+  /** EMI after the last recast — lower than the original once any prepayment has been applied. */
+  finalEmi: number;
+  totalInterest: number;
+  totalPayment: number;
+}
+
+/**
+ * "Lower my EMI" mode: instead of keeping the EMI fixed and finishing early, the extra payments
+ * reduce the principal and the EMI is recomputed (recast) each year for the *original* remaining
+ * tenure — so the loan still ends on schedule, but the monthly payment drops.
+ */
+export function simulateEmiRecast(
+  principal: number,
+  annualRatePct: number,
+  years: number,
+  extraMonthly = 0,
+  extraYearly = 0,
+): RecastResult {
+  const r = annualRatePct / 12 / 100;
+  let balance = principal;
+  let emi = computeEMI(balance, annualRatePct, years).emi;
+  let totalInterest = 0;
+
+  for (let y = 1; y <= years && balance > 0; y++) {
+    for (let m = 0; m < 12 && balance > 0; m++) {
+      const interest = balance * r;
+      const principalComponent = Math.min(emi - interest, balance);
+      totalInterest += interest;
+      balance -= principalComponent;
+      balance = Math.max(balance - extraMonthly, 0);
+    }
+    if (balance <= 0) break;
+    balance = Math.max(balance - extraYearly, 0);
+    const remainingYears = years - y;
+    if (balance > 0 && remainingYears > 0) {
+      emi = computeEMI(balance, annualRatePct, remainingYears).emi;
+    }
+  }
+
+  return { finalEmi: emi, totalInterest, totalPayment: principal + totalInterest };
+}
