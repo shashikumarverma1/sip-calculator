@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/ui/Screen';
 import { colors } from '@/components/ui/theme';
-import { BallGrid, type PartialBall } from '@/components/jar/BallGrid';
+import { BallGrid } from '@/components/jar/BallGrid';
 import { CustomValueKeypad } from '@/components/ui/CustomValueKeypad';
 import { computeSipYearly, type YearBreakdown } from '@/lib/finance/sip';
 import { computeLumpsumYearly } from '@/lib/finance/lumpsum';
