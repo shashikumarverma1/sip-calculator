@@ -7,6 +7,7 @@ import { Screen } from '@/components/ui/Screen';
 import { colors } from '@/components/ui/theme';
 import { BallGrid, type PartialBall } from '@/components/jar/BallGrid';
 import { CustomValueKeypad } from '@/components/ui/CustomValueKeypad';
+import { useProStore } from '@/store/proStore';
 import {
   computeEMI,
   computeEmiYearly,
@@ -89,6 +90,7 @@ function interestOnlyJar(amount: number): JarState {
 }
 
 export default function EmiScreen() {
+  const isPro = useProStore((s) => s.isPro);
   const [phase, setPhase] = useState<Phase>('setup');
   const [loanType, setLoanType] = useState<LoanType>('Home');
   const [principal, setPrincipal] = useState(2000000);
@@ -629,7 +631,7 @@ export default function EmiScreen() {
         )}
       </View>
 
-      <Pressable style={styles.planLink} onPress={() => setPhase('prepay')}>
+      <Pressable style={styles.planLink} onPress={() => (isPro ? setPhase('prepay') : router.push('/paywall'))}>
         <Text style={styles.planLinkText}>Plan my own prepayments</Text>
         <View style={styles.proBadgeSmall}>
           <Text style={styles.proBadgeSmallText}>PRO</Text>

@@ -12,6 +12,7 @@ import { computeLumpsumYearly } from '@/lib/finance/lumpsum';
 import { createJar, jarTotal, familyTotal, type JarState } from '@/lib/balls/types';
 import { addValue } from '@/lib/balls/engine';
 import { formatINR, formatCompactINR } from '@/lib/format';
+import { useRequirePro } from '@/lib/useRequirePro';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 /** Screen horizontal padding (16×2) + the gap between the two race columns. */
@@ -160,6 +161,7 @@ function buildJar(id: string, breakdown: YearBreakdown[]): JarState {
 const remainder = (amount: number) => amount - Math.floor(amount / 1000) * 1000;
 
 export default function CompareScreen() {
+  const isPro = useRequirePro();
   const [phase, setPhase] = useState<Phase>('setup');
   const [race, setRace] = useState<RacePreset>(RACES[0]);
   const [monthly, setMonthly] = useState(5000);
@@ -256,6 +258,8 @@ export default function CompareScreen() {
     setPhase('result');
   };
   const animationDone = safeYear >= years;
+
+  if (!isPro) return null;
 
   // ---------------- SETUP (race picker) ----------------
   if (phase === 'setup') {

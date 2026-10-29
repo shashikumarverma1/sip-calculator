@@ -16,6 +16,7 @@ import { createJar, jarTotal, familyTotal, type JarState } from '@/lib/balls/typ
 import { addValue } from '@/lib/balls/engine';
 import { formatINR, formatCompactINR } from '@/lib/format';
 import { useGoalsStore } from '@/store/goalsStore';
+import { useRequirePro } from '@/lib/useRequirePro';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 /** Screen padding (16×2) + card padding (16×2) + the gap before the goal progress bar + its width. */
@@ -92,6 +93,7 @@ export default function GoalScreen() {
   const insets = useSafeAreaInsets();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { goals, addGoal, markMonthDone } = useGoalsStore();
+  const isPro = useRequirePro();
 
   const effectiveYears = exploreYears ?? years;
   const inflatedCost = adjustInflation ? cost * Math.pow(1 + INFLATION_PCT / 100, effectiveYears) : cost;
@@ -190,6 +192,8 @@ export default function GoalScreen() {
     });
     setPhase('mygoals');
   };
+
+  if (!isPro) return null;
 
   // ---------------- SETUP (goal picker) ----------------
   if (phase === 'setup') {
@@ -549,7 +553,7 @@ export default function GoalScreen() {
         </View>
       </View>
 
-      <Pressable style={styles.saveTrackRow} onPress={saveAndTrack}>
+      <Pressable style={styles.saveTrackRow} onPress={isPro ? saveAndTrack : () => router.push('/paywall')}>
         <View style={{ flex: 1 }}>
           <Text style={styles.saveTrackTitle}>Save & track this goal</Text>
           <Text style={styles.saveTrackSubtitle}>Tick each month's SIP and watch the jar fill</Text>

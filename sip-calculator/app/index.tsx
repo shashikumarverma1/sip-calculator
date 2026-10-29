@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { colors } from '@/components/ui/theme';
 import { ProBadge } from '@/components/ui/ProBadge';
 import { Screen } from '@/components/ui/Screen';
+import { useProStore } from '@/store/proStore';
 
 interface CalcTile {
   href: '/sip' | '/emi' | '/lumpsum' | '/compare' | '/goal' | '/freedom';
@@ -23,6 +24,8 @@ const TILES: CalcTile[] = [
 ];
 
 export default function Home() {
+  const isPro = useProStore((s) => s.isPro);
+
   return (
     <Screen>
       <View style={styles.header}>
@@ -41,18 +44,20 @@ export default function Home() {
       <Text style={styles.sectionLabel}>Calculators</Text>
       <View style={styles.grid}>
         {TILES.map((t) => (
-          <Link key={t.href} href={t.href} asChild>
-            <Pressable style={styles.tile}>
-              {t.pro && <ProBadge />}
-              <View style={styles.dotsRow}>
-                {t.dots.map((c, i) => (
-                  <View key={i} style={[styles.dot, { backgroundColor: c, marginLeft: i === 0 ? 0 : -8 }]} />
-                ))}
-              </View>
-              <Text style={styles.tileTitle}>{t.title}</Text>
-              <Text style={styles.tileSubtitle}>{t.subtitle}</Text>
-            </Pressable>
-          </Link>
+          <Pressable
+            key={t.href}
+            style={styles.tile}
+            onPress={() => router.push(t.pro && !isPro ? '/paywall' : t.href)}
+          >
+            {t.pro && <ProBadge />}
+            <View style={styles.dotsRow}>
+              {t.dots.map((c, i) => (
+                <View key={i} style={[styles.dot, { backgroundColor: c, marginLeft: i === 0 ? 0 : -8 }]} />
+              ))}
+            </View>
+            <Text style={styles.tileTitle}>{t.title}</Text>
+            <Text style={styles.tileSubtitle}>{t.subtitle}</Text>
+          </Pressable>
         ))}
       </View>
 

@@ -17,6 +17,7 @@ import { requiredMonthlySip } from '@/lib/finance/goal';
 import { createJar, familyTotal, type JarState, type Ball } from '@/lib/balls/types';
 import { addValue, removeValue } from '@/lib/balls/engine';
 import { formatINR, formatCompactINR } from '@/lib/format';
+import { useRequirePro } from '@/lib/useRequirePro';
 
 type Phase = 'setup' | 'playing' | 'result' | 'closegap' | 'share';
 type CustomField = 'corpus' | 'expense' | 'rate' | null;
@@ -91,6 +92,7 @@ function buildSnapshots(corpus: number, yearlyFlows: YearFlow[]) {
 }
 
 export default function FreedomScreen() {
+  const isPro = useRequirePro();
   const [phase, setPhase] = useState<Phase>('setup');
   const [corpus, setCorpus] = useState(1000000);
   const [monthlyExpense, setMonthlyExpense] = useState(10000);
@@ -192,6 +194,8 @@ export default function FreedomScreen() {
     setPhase('result');
   };
   const animationDone = safeYear >= totalYears;
+
+  if (!isPro) return null;
 
   // ---------------- SETUP ----------------
   if (phase === 'setup') {
