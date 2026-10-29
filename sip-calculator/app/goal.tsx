@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput, Dimensions } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/ui/Screen';
@@ -16,6 +16,11 @@ import { createJar, jarTotal, familyTotal, type JarState } from '@/lib/balls/typ
 import { addValue } from '@/lib/balls/engine';
 import { formatINR, formatCompactINR } from '@/lib/format';
 import { useGoalsStore } from '@/store/goalsStore';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+/** Screen padding (16×2) + card padding (16×2) + the gap before the goal progress bar + its width. */
+const GOAL_JAR_WIDTH = SCREEN_WIDTH - 32 - 32 - 14 - 20;
+const GOAL_JAR_HEIGHT = 320;
 
 type Phase = 'setup' | 'configure' | 'playing' | 'result' | 'mygoals';
 type CustomField = 'cost' | 'saved' | null;
@@ -394,8 +399,8 @@ export default function GoalScreen() {
               <Text style={styles.pctText}>{pctComplete}%</Text>
             </View>
             <View style={styles.playingRow}>
-              <BallGrid width={230} height={220} balls={visibleBalls} partials={currentPartials} />
-              <View style={styles.goalBarOuter}>
+              <BallGrid width={GOAL_JAR_WIDTH} height={GOAL_JAR_HEIGHT} balls={visibleBalls} partials={currentPartials} />
+              <View style={[styles.goalBarOuter, { height: GOAL_JAR_HEIGHT }]}>
                 <View style={[styles.goalBarFill, { height: `${pctComplete}%` }]} />
               </View>
             </View>
