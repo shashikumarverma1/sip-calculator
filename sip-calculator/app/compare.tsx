@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Dimensions } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,6 +12,11 @@ import { computeLumpsumYearly } from '@/lib/finance/lumpsum';
 import { createJar, jarTotal, familyTotal, type JarState } from '@/lib/balls/types';
 import { addValue } from '@/lib/balls/engine';
 import { formatINR, formatCompactINR } from '@/lib/format';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+/** Screen horizontal padding (16×2) + the gap between the two race columns. */
+const RACE_JAR_WIDTH = (SCREEN_WIDTH - 32 - 12) / 2;
+const RACE_JAR_HEIGHT = RACE_JAR_WIDTH * 1.9;
 
 type Phase = 'setup' | 'configure' | 'playing' | 'result' | 'share';
 type SideKind = 'sip' | 'lumpsum' | 'delayedSip';
@@ -457,12 +462,12 @@ export default function CompareScreen() {
             <View style={styles.raceColumn}>
               <Text style={styles.raceColumnLabel}>{race.labelA}</Text>
               <Text style={styles.raceColumnValue}>{formatCompactINR(currentA.total)}</Text>
-              <BallGrid width={150} height={220} balls={visibleA} partials={safeYear > 0 ? partialsFor(jarA).map((p) => ({ ...p, amount: remainder(currentA[p.family === 'principal' ? 'invested' : 'returns']) })) : []} />
+              <BallGrid width={RACE_JAR_WIDTH} height={RACE_JAR_HEIGHT} balls={visibleA} partials={safeYear > 0 ? partialsFor(jarA).map((p) => ({ ...p, amount: remainder(currentA[p.family === 'principal' ? 'invested' : 'returns']) })) : []} />
             </View>
             <View style={styles.raceColumn}>
               <Text style={styles.raceColumnLabel}>{race.labelB}</Text>
               <Text style={styles.raceColumnValue}>{formatCompactINR(currentB.total)}</Text>
-              <BallGrid width={150} height={220} balls={visibleB} partials={safeYear > 0 ? partialsFor(jarB).map((p) => ({ ...p, amount: remainder(currentB[p.family === 'principal' ? 'invested' : 'returns']) })) : []} />
+              <BallGrid width={RACE_JAR_WIDTH} height={RACE_JAR_HEIGHT} balls={visibleB} partials={safeYear > 0 ? partialsFor(jarB).map((p) => ({ ...p, amount: remainder(currentB[p.family === 'principal' ? 'invested' : 'returns']) })) : []} />
             </View>
           </View>
 
