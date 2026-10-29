@@ -1,8 +1,15 @@
+import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useProStore } from '@/store/proStore';
 
 export default function RootLayout() {
+  const init = useProStore((s) => s.init);
+  useEffect(() => {
+    init();
+  }, [init]);
+
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />

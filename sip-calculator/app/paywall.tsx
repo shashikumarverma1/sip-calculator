@@ -1,9 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { PurchasesPackage } from 'react-native-purchases';
 import { colors } from '@/components/ui/theme';
 import { Screen } from '@/components/ui/Screen';
+import { fetchCurrentOffering, purchaseLifetimePackage, restorePurchases, hasProEntitlement } from '@/lib/purchases';
+import { useProStore } from '@/store/proStore';
 
 const FEATURES = [
   'Financial Freedom meter',
@@ -15,6 +18,66 @@ const FEATURES = [
 
 export default function PaywallScreen() {
   const insets = useSafeAreaInsets();
+  const setFromCustomerInfo = useProStore((s) => s.setFromCustomerInfo);
+  const isPro = useProStore((s) => s.isPro);
+  const [lifetimePackage, setLifetimePackage] = useState<PurchasesPackage | null>(null);
+  const [offeringLoading, setOfferingLoading] = useState(true);
+  const [purchasing, setPurchasing] = useState(false);
+  const [restoring, setRestoring] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchCurrentOffering()
+      .then((offering) => {
+        if (cancelled) return;
+        const pkg = offering?.lifetime ?? offering?.availablePackages.find((p) => p.packageType === 'LIFETIME') ?? offering?.availablePackages[0] ?? null;
+        setLifetimePackage(pkg);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setOfferingLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const unlock = async () => {
+    if (!lifetimePackage || purchasing) return;
+    setPurchasing(true);
+    try {
+      const info = await purchaseLifetimePackage(lifetimePackage);
+      setFromCustomerInfo(info);
+      router.back();
+    } catch (e: any) {
+      if (!e?.userCancelled) {
+        Alert.alert('Purchase failed', e?.message ?? 'Something went wrong. Please try again.');
+      }
+    } finally {
+      setPurchasing(false);
+    }
+  };
+
+  const restore = async () => {
+    if (restoring) return;
+    setRestoring(true);
+    try {
+      const info = await restorePurchases();
+      setFromCustomerInfo(info);
+      const restored = hasProEntitlement(info);
+      Alert.alert(
+        restored ? 'Restored' : 'Nothing to restore',
+        restored ? 'Your Pro access has been restored.' : 'No previous purchase was found for this account.'
+      );
+    } catch (e: any) {
+      Alert.alert('Restore failed', e?.message ?? 'Something went wrong. Please try again.');
+    } finally {
+      setRestoring(false);
+    }
+  };
+
+  const priceText = lifetimePackage?.product.priceString ?? '₹149';
+
   return (
     <Screen contentContainerStyle={{ padding: 20, flexGrow: 1 }}>
       <Pressable style={[styles.closeButton, { top: insets.top + 4 }]} onPress={() => router.back()} hitSlop={10}>
@@ -45,17 +108,27 @@ export default function PaywallScreen() {
           <Text style={styles.priceLabel}>Lifetime access</Text>
           <Text style={styles.priceSubtext}>One payment · no renewals</Text>
         </View>
-        {/* Price is a placeholder until RevenueCat is wired up — it should show the
-         * localized price from customerInfo at that point, not a hardcoded value. */}
-        <Text style={styles.price}>₹149</Text>
+        {offeringLoading ? <ActivityIndicator color={colors.gold} /> : <Text style={styles.price}>{priceText}</Text>}
       </View>
 
-      <Pressable style={styles.unlockButton} onPress={() => router.back()}>
-        <Text style={styles.unlockText}>Unlock Pro forever</Text>
-      </Pressable>
+      {isPro ? (
+        <View style={[styles.unlockButton, styles.unlockButtonDone]}>
+          <Text style={styles.unlockText}>✓ You already own Pro</Text>
+        </View>
+      ) : (
+        <Pressable
+          style={[styles.unlockButton, (!lifetimePackage || purchasing) && styles.unlockButtonDisabled]}
+          disabled={!lifetimePackage || purchasing}
+          onPress={unlock}
+        >
+          {purchasing ? <ActivityIndicator color="#1a1200" /> : <Text style={styles.unlockText}>Unlock Pro forever</Text>}
+        </Pressable>
+      )}
 
       <View style={styles.footerRow}>
-        <Text style={styles.footerLink}>Restore purchases</Text>
+        <Pressable onPress={restore} disabled={restoring}>
+          <Text style={styles.footerLink}>{restoring ? 'Restoring…' : 'Restore purchases'}</Text>
+        </Pressable>
         <Text style={styles.footerDivider}>·</Text>
         <Text style={styles.footerLink}>Terms</Text>
         <Text style={styles.footerDivider}>·</Text>
@@ -93,6 +166,8 @@ const styles = StyleSheet.create({
   priceSubtext: { color: colors.textFaint, fontSize: 11, marginTop: 2 },
   price: { color: colors.gold, fontSize: 22, fontWeight: '900' },
   unlockButton: { backgroundColor: colors.gold, borderRadius: 20, paddingVertical: 18, alignItems: 'center' },
+  unlockButtonDisabled: { opacity: 0.5 },
+  unlockButtonDone: { backgroundColor: colors.cardAlt },
   unlockText: { color: '#1a1200', fontWeight: '900', fontSize: 16 },
   footerRow: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginTop: 24 },
   footerLink: { color: colors.textFaint, fontSize: 11 },
