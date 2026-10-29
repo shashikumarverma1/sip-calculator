@@ -16,15 +16,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.shashi.SipCalculator"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.shashi.SipCalculator",
-      "edgeToEdgeEnabled": true
+      "package": "com.shashi.SipCalculator"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,7 +35,12 @@
       }
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font",
+      "expo-sharing",
+      "expo-splash-screen",
+      "expo-status-bar",
+      "expo-web-browser"
     ]
   }
 }
