@@ -4,12 +4,21 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "prebuild": "expo prebuild",
+    "prebuild": "npx expo prebuild --platform android --clean",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "build:android:prod:release": "cd android && ./gradlew bundleRelease && cd ..",
+    "build:android:prod:apk": "cd android && ./gradlew assembleRelease && cd ..",
+    "clean": "rm -rf android ios node_modules yarn.lock package-lock.json ios/Pods ios/Podfile.lock android/build && yarn install && npx expo install --check npx expo install --fix",
+    "disk": "rm -rf ~/Library/Developer/Xcode/DerivedData/* ~/Library/Developer/Xcode/Archives/* ~/Library/Developer/Xcode/iOS\\ DeviceSupport/* ~/Library/Caches/CocoaPods/* && xcrun simctl delete unavailable",
+    "update": "eas update --branch production  ",
+    "build:prod:android": "eas build --platform android --profile production",
+    "build:submit:prod:android": "eas submit --platform android --profile production",
+    "build:prod:ios": "eas build --platform ios --profile production",
+    "eas:secret": "eas env:push production --path .env --force"
   },
   "jest": {
     "preset": "jest-expo"
