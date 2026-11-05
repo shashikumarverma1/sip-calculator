@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Switch } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Switch, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/ui/Screen';
@@ -17,6 +17,7 @@ import { requiredMonthlySip } from '@/lib/finance/goal';
 import { createJar, familyTotal, type JarState, type Ball } from '@/lib/balls/types';
 import { addValue, removeValue } from '@/lib/balls/engine';
 import { formatINR, formatCompactINR } from '@/lib/format';
+import { useSubscription } from '@/lib/subscription/SubscriptionContext';
 
 type Phase = 'setup' | 'playing' | 'result' | 'closegap' | 'share';
 type CustomField = 'corpus' | 'expense' | 'rate' | null;
@@ -90,7 +91,40 @@ function buildSnapshots(corpus: number, yearlyFlows: YearFlow[]) {
   return snapshots;
 }
 
+/** Financial Freedom is a Pro feature: show a lock screen until the "pro" entitlement is active. */
 export default function FreedomScreen() {
+  const { isPro, loading } = useSubscription();
+  if (isPro) return <FreedomScreenContent />;
+  return (
+    <Screen contentContainerStyle={lockStyles.container}>
+      {loading ? (
+        <ActivityIndicator color={colors.gold} />
+      ) : (
+        <>
+          <Text style={lockStyles.title}>🔒 Financial Freedom is a Pro feature</Text>
+          <Text style={lockStyles.subtitle}>See how long your money lasts, with inflation.</Text>
+          <Pressable style={lockStyles.button} onPress={() => router.push('/paywall')}>
+            <Text style={lockStyles.buttonText}>Unlock Pro</Text>
+          </Pressable>
+          <Pressable onPress={() => router.back()} hitSlop={8}>
+            <Text style={lockStyles.back}>Go back</Text>
+          </Pressable>
+        </>
+      )}
+    </Screen>
+  );
+}
+
+const lockStyles = StyleSheet.create({
+  container: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  title: { color: colors.text, fontSize: 18, fontWeight: '900', textAlign: 'center' },
+  subtitle: { color: colors.textMuted, fontSize: 13, marginTop: 8, textAlign: 'center' },
+  button: { backgroundColor: colors.gold, borderRadius: 20, paddingVertical: 16, paddingHorizontal: 40, marginTop: 24 },
+  buttonText: { color: '#1a1200', fontWeight: '900', fontSize: 15 },
+  back: { color: colors.textFaint, fontSize: 12, marginTop: 16 },
+});
+
+function FreedomScreenContent() {
   const [phase, setPhase] = useState<Phase>('setup');
   const [corpus, setCorpus] = useState(1000000);
   const [monthlyExpense, setMonthlyExpense] = useState(10000);

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput, Dimensions } from 'react-native';
 import { router } from 'expo-router';
+import { useProGate } from '@/lib/subscription/useProGate';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/ui/Screen';
 import { colors } from '@/components/ui/theme';
@@ -76,6 +77,7 @@ const CURRENT_MONTH_NAME = new Date().toLocaleString('default', { month: 'long' 
 const CURRENT_MONTH_KEY = `${CURRENT_YEAR}-${new Date().getMonth()}`;
 
 export default function GoalScreen() {
+  const { isPro, requirePro } = useProGate();
   const [phase, setPhase] = useState<Phase>('setup');
   const [preset, setPreset] = useState<GoalPreset>(GOAL_PRESETS[0]);
   const [goalName, setGoalName] = useState(GOAL_PRESETS[0].title);
@@ -549,14 +551,16 @@ export default function GoalScreen() {
         </View>
       </View>
 
-      <Pressable style={styles.saveTrackRow} onPress={saveAndTrack}>
+      <Pressable style={styles.saveTrackRow} onPress={() => requirePro('Save & track goals', saveAndTrack)}>
         <View style={{ flex: 1 }}>
           <Text style={styles.saveTrackTitle}>Save & track this goal</Text>
           <Text style={styles.saveTrackSubtitle}>Tick each month's SIP and watch the jar fill</Text>
         </View>
-        <View style={styles.proBadgeSmall}>
-          <Text style={styles.proBadgeSmallText}>PRO</Text>
-        </View>
+        {!isPro && (
+          <View style={styles.proBadgeSmall}>
+            <Text style={styles.proBadgeSmallText}>PRO</Text>
+          </View>
+        )}
       </Pressable>
 
       <Pressable style={styles.ctaButton} onPress={() => router.push('/sip')}>

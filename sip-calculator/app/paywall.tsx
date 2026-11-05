@@ -1,5 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import type { PurchasesPackage } from 'react-native-purchases';
+import { useSubscription } from '@/lib/subscription/SubscriptionContext';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '@/components/ui/theme';
@@ -15,6 +17,23 @@ const FEATURES = [
 
 export default function PaywallScreen() {
   const insets = useSafeAreaInsets();
+  const { isPro, loading, available, lifetimePackage, purchase, restore } = useSubscription();
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const buy = async (pkg: PurchasesPackage) => {
+    setBusy(pkg.identifier);
+    const unlocked = await purchase(pkg);
+    setBusy(null);
+    if (unlocked) router.back();
+  };
+
+  const onRestore = async () => {
+    setBusy('restore');
+    const unlocked = await restore();
+    setBusy(null);
+    if (unlocked) router.back();
+  };
+
   return (
     <Screen contentContainerStyle={{ padding: 20, flexGrow: 1 }}>
       <Pressable style={[styles.closeButton, { top: insets.top + 4 }]} onPress={() => router.back()} hitSlop={10}>
@@ -40,22 +59,43 @@ export default function PaywallScreen() {
         ))}
       </View>
 
-      <View style={styles.priceCard}>
-        <View>
-          <Text style={styles.priceLabel}>Lifetime access</Text>
-          <Text style={styles.priceSubtext}>One payment · no renewals</Text>
+      {isPro ? (
+        <View style={styles.priceCard}>
+          <Text style={styles.priceLabel}>✓ JarUp Pro is active on this account</Text>
         </View>
-        {/* Price is a placeholder until RevenueCat is wired up — it should show the
-         * localized price from customerInfo at that point, not a hardcoded value. */}
-        <Text style={styles.price}>₹149</Text>
-      </View>
-
-      <Pressable style={styles.unlockButton} onPress={() => router.back()}>
-        <Text style={styles.unlockText}>Unlock Pro forever</Text>
-      </Pressable>
+      ) : loading ? (
+        <ActivityIndicator color={colors.gold} style={{ marginVertical: 24 }} />
+      ) : !lifetimePackage ? (
+        <Text style={styles.emptyText}>
+          {available ? 'Pro is not available right now. Please try again later.' : 'Purchases are not available on this device.'}
+        </Text>
+      ) : (
+        <View style={styles.packageBlock}>
+          <View style={styles.priceCard}>
+            <View style={{ flex: 1, paddingRight: 12 }}>
+              <Text style={styles.priceLabel}>Lifetime access</Text>
+              <Text style={styles.priceSubtext}>One payment · no renewals</Text>
+            </View>
+            <Text style={styles.price}>{lifetimePackage.product.priceString}</Text>
+          </View>
+          <Pressable
+            style={[styles.unlockButton, busy !== null && styles.disabled]}
+            disabled={busy !== null}
+            onPress={() => buy(lifetimePackage)}
+          >
+            {busy === lifetimePackage.identifier ? (
+              <ActivityIndicator color="#1a1200" />
+            ) : (
+              <Text style={styles.unlockText}>Unlock Pro forever · {lifetimePackage.product.priceString}</Text>
+            )}
+          </Pressable>
+        </View>
+      )}
 
       <View style={styles.footerRow}>
-        <Text style={styles.footerLink}>Restore purchases</Text>
+        <Pressable onPress={onRestore} disabled={busy !== null || !available} hitSlop={8}>
+          <Text style={styles.footerLink}>{busy === 'restore' ? 'Restoring…' : 'Restore purchases'}</Text>
+        </Pressable>
         <Text style={styles.footerDivider}>·</Text>
         <Text style={styles.footerLink}>Terms</Text>
         <Text style={styles.footerDivider}>·</Text>
@@ -97,4 +137,7 @@ const styles = StyleSheet.create({
   footerRow: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginTop: 24 },
   footerLink: { color: colors.textFaint, fontSize: 11 },
   footerDivider: { color: colors.textFaint, fontSize: 11 },
+  packageBlock: { marginBottom: 20 },
+  disabled: { opacity: 0.6 },
+  emptyText: { color: colors.textMuted, fontSize: 13, textAlign: 'center', marginVertical: 24 },
 });

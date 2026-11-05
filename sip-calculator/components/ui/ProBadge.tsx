@@ -1,8 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors } from './theme';
+import { useSubscription } from '@/lib/subscription/SubscriptionContext';
 
+/** Gold "PRO" corner badge. Hidden once the user owns Pro. */
 export function ProBadge() {
+  const { isPro } = useSubscription();
+  if (isPro) return null;
   return (
     <View style={styles.badge}>
       <Text style={styles.text}>PRO</Text>
