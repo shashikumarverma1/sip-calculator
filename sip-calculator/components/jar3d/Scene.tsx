@@ -8,7 +8,6 @@
  */
 import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Gyroscope } from 'expo-sensors';
 // @ts-expect-error - verify these exports against the installed react-native-filament version
 import { FilamentScene, FilamentView, Camera, DefaultLight, Model, useFilamentContext } from 'react-native-filament';
 import { JarState } from '@/lib/balls/types';
@@ -16,7 +15,6 @@ import { JarScene, JarBounds } from './sceneState';
 
 const TOP_BOUNDS: JarBounds = { centerX: 0, centerZ: 0, radius: 60, floorY: 220 };
 const BOTTOM_BOUNDS: JarBounds = { centerX: 0, centerZ: 0, radius: 90, floorY: 0 };
-const MAX_TILT_DEG = 6;
 
 export interface TwoJarSceneProps {
   topJar: JarState;
@@ -30,15 +28,6 @@ export function TwoJarScene({ topJar, bottomJar, onFrame }: TwoJarSceneProps) {
   const bottomScene = useRef(new JarScene(BOTTOM_BOUNDS)).current;
   const tilt = useRef({ x: 0, y: 0 });
   const raf = useRef<number | null>(null);
-
-  useEffect(() => {
-    const sub = Gyroscope.addListener(({ x, y }) => {
-      tilt.current.x = Math.max(-MAX_TILT_DEG, Math.min(MAX_TILT_DEG, x * 20));
-      tilt.current.y = Math.max(-MAX_TILT_DEG, Math.min(MAX_TILT_DEG, y * 20));
-    });
-    Gyroscope.setUpdateInterval(100);
-    return () => sub.remove();
-  }, []);
 
   useEffect(() => {
     topScene.syncWithJar(topJar);
@@ -81,7 +70,7 @@ export function TwoJarScene({ topJar, bottomJar, onFrame }: TwoJarSceneProps) {
         <FilamentView style={styles.filament}>
           <Camera
             position={[0, 220, 420]}
-            // Camera tilted ~20° from above, plus gyroscope parallax of up to ±6°.
+            // Camera tilted ~20° from above.
             rotation={[-20 + tilt.current.y, tilt.current.x, 0]}
           />
           <DefaultLight intensity={60000} />

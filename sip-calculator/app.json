@@ -7,11 +7,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0f1420"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -24,23 +19,47 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0f1420"
       },
-      "package": "com.shashi.SipCalculator"
+      "package": "com.SipCalculator.app",
+      "versionCode": 2,
+      "blockedPermissions": [
+        "android.permission.ACTIVITY_RECOGNITION",
+        "android.permission.BODY_SENSORS",
+        "android.permission.BODY_SENSORS_BACKGROUND",
+        "android.permission.HIGH_SAMPLING_RATE_SENSORS",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "9acc456b-0176-4b94-a570-d36fab9f31ba"
+        "projectId": "85d7365b-8f40-4646-8b31-bbe6b29169cc"
+      },
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
       }
     },
     "plugins": [
       "expo-router",
       "expo-font",
       "expo-sharing",
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0f1420"
+        }
+      ],
       "expo-status-bar",
-      "expo-web-browser"
-    ]
+      "expo-web-browser",
+      "./plugins/withGradleMemory"
+    ],
+    "owner": "shashikumarverma"
   }
 }

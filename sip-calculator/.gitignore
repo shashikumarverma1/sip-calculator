@@ -79,3 +79,9 @@ yarn-error.*
 *.tsbuildinfo
 
 # @end expo-cli
+
+
+# Android signing (never commit)
+*.keystore
+credentials.json
+upload_certificate.pem
