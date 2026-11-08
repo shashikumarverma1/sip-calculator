@@ -2,7 +2,7 @@
   "expo": {
     "name": "JarUp (SIP/EMI Calculator)",
     "slug": "sip-calculator",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "scheme": "jarup",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,7 +28,7 @@
       "permissions": [
         "com.android.vending.BILLING"
       ],
-      "versionCode": 3,
+      "versionCode": 7,
       "blockedPermissions": [
         "android.permission.ACTIVITY_RECOGNITION",
         "android.permission.BODY_SENSORS",
