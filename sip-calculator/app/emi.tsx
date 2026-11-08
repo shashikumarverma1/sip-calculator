@@ -90,7 +90,7 @@ function interestOnlyJar(amount: number): JarState {
 }
 
 export default function EmiScreen() {
-  const { isPro, requirePro } = useProGate();
+  const { locked, requirePro } = useProGate();
   const [phase, setPhase] = useState<Phase>('setup');
   const [loanType, setLoanType] = useState<LoanType>('Home');
   const [principal, setPrincipal] = useState(2000000);
@@ -633,7 +633,7 @@ export default function EmiScreen() {
 
       <Pressable style={styles.planLink} onPress={() => requirePro('Prepayment planner', () => setPhase('prepay'))}>
         <Text style={styles.planLinkText}>Plan my own prepayments</Text>
-        {!isPro && (
+        {locked && (
           <View style={styles.proBadgeSmall}>
             <Text style={styles.proBadgeSmallText}>PRO</Text>
           </View>

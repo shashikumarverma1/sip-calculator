@@ -24,15 +24,23 @@ const TILES: CalcTile[] = [
 ];
 
 export default function Home() {
-  const { isPro, requirePro } = useProGate();
+  const { isPro, locked, requirePro } = useProGate();
   return (
     <Screen>
       <View style={styles.header}>
-        <Text style={styles.brand}>🫙 JarUp</Text>
-        {!isPro && (
+        {/* Hidden: long-press the title to open the RevenueCat debug screen. */}
+        <Pressable onLongPress={() => router.push('/debug')} delayLongPress={1500}>
+          <Text style={styles.brand}>🫙 JarUp</Text>
+        </Pressable>
+        {locked && (
           <Pressable style={styles.goProButton} onPress={() => router.push('/paywall')}>
             <Text style={styles.goProText}>Go Pro</Text>
           </Pressable>
+        )}
+        {isPro && (
+          <View style={styles.proChip} accessibilityLabel="JarUp Pro active">
+            <Text style={styles.proChipText}>Pro ✓</Text>
+          </View>
         )}
       </View>
 
@@ -73,6 +81,8 @@ const styles = StyleSheet.create({
   brand: { color: colors.text, fontSize: 20, fontWeight: '900' },
   goProButton: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 7 },
   goProText: { color: colors.gold, fontWeight: '800', fontSize: 12 },
+  proChip: { backgroundColor: colors.gold + '22', borderWidth: 1, borderColor: colors.gold + '66', borderRadius: 14, paddingHorizontal: 12, paddingVertical: 7 },
+  proChipText: { color: colors.gold, fontWeight: '900', fontSize: 12 },
   hero: {
     backgroundColor: colors.card,
     borderWidth: 1,

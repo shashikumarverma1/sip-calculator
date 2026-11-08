@@ -1,0 +1,16 @@
+diff --git a/node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift b/node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift
+index de76b97..5b1272d 100644
+--- a/node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift
++++ b/node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift
+@@ -941,8 +941,11 @@ private func withEncodedValue(
+     }
+     // The runtime can't be deallocated during a call on its JavaScript thread, so it's borrowed without
+     // a retain.
++    // Passed as its address (Sendable) so Swift 6.2 (Xcode 26) accepts the capture; same pointer.
++    let slotAddress = UInt(bitPattern: slot)
+     try runtime._withUnsafeGuaranteedRef { runtime in
+       try JavaScriptActor.assumeIsolated {
++        let slot = UnsafeMutablePointer<facebook.jsi.Value>(bitPattern: slotAddress)!
+         try encode(JavaScriptValue.Slot(slot), runtime)
+       }
+     }

@@ -11,8 +11,13 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.shashi.SipCalculator"
+      "supportsTablet": false,
+      "bundleIdentifier": "com.SipCalculator.app",
+      "version": "1.0",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -62,7 +67,8 @@
       ],
       "expo-status-bar",
       "expo-web-browser",
-      "./plugins/withGradleMemory"
+      "./plugins/withGradleMemory",
+      "./plugins/withRevenueCatPods"
     ],
     "owner": "shashikumarverma"
   }

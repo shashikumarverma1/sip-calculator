@@ -22,6 +22,7 @@ export default function RootLayout() {
           <Stack.Screen name="goal" />
           <Stack.Screen name="freedom" />
           <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="debug" />
         </Stack>
       </SubscriptionProvider>
     </SafeAreaProvider>

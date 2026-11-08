@@ -77,7 +77,7 @@ const CURRENT_MONTH_NAME = new Date().toLocaleString('default', { month: 'long' 
 const CURRENT_MONTH_KEY = `${CURRENT_YEAR}-${new Date().getMonth()}`;
 
 export default function GoalScreen() {
-  const { isPro, requirePro } = useProGate();
+  const { locked, requirePro } = useProGate();
   const [phase, setPhase] = useState<Phase>('setup');
   const [preset, setPreset] = useState<GoalPreset>(GOAL_PRESETS[0]);
   const [goalName, setGoalName] = useState(GOAL_PRESETS[0].title);
@@ -556,7 +556,7 @@ export default function GoalScreen() {
           <Text style={styles.saveTrackTitle}>Save & track this goal</Text>
           <Text style={styles.saveTrackSubtitle}>Tick each month's SIP and watch the jar fill</Text>
         </View>
-        {!isPro && (
+        {locked && (
           <View style={styles.proBadgeSmall}>
             <Text style={styles.proBadgeSmallText}>PRO</Text>
           </View>

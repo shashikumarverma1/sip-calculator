@@ -35,7 +35,7 @@ function buildJar(breakdown: YearBreakdown[]): JarState {
 }
 
 export default function SipScreen() {
-  const { isPro, requirePro } = useProGate();
+  const { locked, requirePro } = useProGate();
   const [phase, setPhase] = useState<Phase>('setup');
   const [monthly, setMonthly] = useState(5000);
   const [ratePct, setRatePct] = useState(11);
@@ -227,7 +227,7 @@ export default function SipScreen() {
             <Text style={styles.proRowTitle}>Step-up every year</Text>
             <Text style={styles.proRowSubtitle}>Grow your SIP with your salary</Text>
           </View>
-          {!isPro && (
+          {locked && (
             <View style={styles.proBadgeSmall}>
               <Text style={styles.proBadgeSmallText}>🔒 PRO</Text>
             </View>
@@ -444,10 +444,10 @@ export default function SipScreen() {
           <Text style={styles.proActionText}>💾 Save plan</Text>
         </Pressable>
         <Pressable style={styles.proActionButton} onPress={() => requirePro('SIP vs FD', () => router.push('/compare'))}>
-          <Text style={styles.proActionText}>⇄ vs FD{isPro ? '' : ' · PRO'}</Text>
+          <Text style={styles.proActionText}>⇄ vs FD{locked ? ' · PRO' : ''}</Text>
         </Pressable>
         <Pressable style={styles.proActionButton} onPress={() => requirePro('Step-up SIP', () => showComingSoon('Step-up SIP'))}>
-          <Text style={styles.proActionText}>📈 Step-up{isPro ? '' : ' · PRO'}</Text>
+          <Text style={styles.proActionText}>📈 Step-up{locked ? ' · PRO' : ''}</Text>
         </Pressable>
       </View>
 

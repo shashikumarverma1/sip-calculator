@@ -36,7 +36,7 @@ function buildJar(principal: number, yearly: LumpsumResult[]): JarState {
 const remainder = (amount: number) => amount - Math.floor(amount / 1000) * 1000;
 
 export default function LumpsumScreen() {
-  const { isPro, requirePro } = useProGate();
+  const { locked, requirePro } = useProGate();
   const [phase, setPhase] = useState<Phase>('setup');
   const [principal, setPrincipal] = useState(100000);
   const [ratePct, setRatePct] = useState(12);
@@ -220,7 +220,7 @@ export default function LumpsumScreen() {
             <Text style={styles.proRowTitle}>Add yearly top-ups</Text>
             <Text style={styles.proRowSubtitle}>Drop extra money every year (bonus, savings)</Text>
           </View>
-          {!isPro && (
+          {locked && (
             <View style={styles.proBadgeSmall}>
               <Text style={styles.proBadgeSmallText}>🔒 PRO</Text>
             </View>
@@ -460,10 +460,10 @@ export default function LumpsumScreen() {
           <Text style={styles.proActionText}>💾 Save plan</Text>
         </Pressable>
         <Pressable style={styles.proActionButton} onPress={() => requirePro('Lumpsum vs FD', () => router.push('/compare'))}>
-          <Text style={styles.proActionText}>⇄ vs FD{isPro ? '' : ' · PRO'}</Text>
+          <Text style={styles.proActionText}>⇄ vs FD{locked ? ' · PRO' : ''}</Text>
         </Pressable>
         <Pressable style={styles.proActionButton} onPress={() => requirePro('Yearly top-ups', () => showComingSoon('Yearly top-ups'))}>
-          <Text style={styles.proActionText}>➕ Top-ups{isPro ? '' : ' · PRO'}</Text>
+          <Text style={styles.proActionText}>➕ Top-ups{locked ? ' · PRO' : ''}</Text>
         </Pressable>
       </View>
 
