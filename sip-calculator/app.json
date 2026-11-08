@@ -12,8 +12,8 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.SipCalculator.app",
-      "version": "1.0",
+      "bundleIdentifier": "com.shashiverma.sipcalculator",
+      "version": "1.0.0",
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false

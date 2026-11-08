@@ -18,6 +18,7 @@
     "build:prod:android": "eas build -p android --profile production",
     "build:submit:prod:android": "eas submit --platform android --profile production",
     "build:prod:ios": "eas build --platform ios --profile production",
+    "build:submit:prod:ios": "eas submit -p ios --latest",
     "eas:secret": "eas env:push production --path .env --force",
     "postinstall": "patch-package"
   },
