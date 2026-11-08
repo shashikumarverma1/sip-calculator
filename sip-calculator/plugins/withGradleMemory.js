@@ -1,11 +1,12 @@
 const { withGradleProperties } = require('expo/config-plugins');
 
 // Keeps the Gradle daemon from being OOM-killed on EAS when R8 and the native
-// CMake builds (worklets, screens, skia) run at the same time.
+// CMake builds (worklets, reanimated, skia) run at the same time. One worker
+// serialises them; RevenueCat (Compose + Amazon SDK) made R8 much heavier.
 const PROPERTIES = {
   'org.gradle.jvmargs': '-Xmx3g -XX:MaxMetaspaceSize=768m',
   'org.gradle.parallel': 'false',
-  'org.gradle.workers.max': '2',
+  'org.gradle.workers.max': '1',
   // Compile Kotlin inside the Gradle daemon instead of a separate Kotlin daemon JVM.
   'kotlin.compiler.execution.strategy': 'in-process',
 };

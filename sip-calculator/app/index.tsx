@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
+import { useProGate } from '@/lib/subscription/useProGate';
 import { colors } from '@/components/ui/theme';
 import { ProBadge } from '@/components/ui/ProBadge';
 import { Screen } from '@/components/ui/Screen';
@@ -23,13 +24,24 @@ const TILES: CalcTile[] = [
 ];
 
 export default function Home() {
+  const { isPro, locked, requirePro } = useProGate();
   return (
     <Screen>
       <View style={styles.header}>
-        <Text style={styles.brand}>🫙 JarUp</Text>
-        <Pressable style={styles.goProButton} onPress={() => router.push('/paywall')}>
-          <Text style={styles.goProText}>Go Pro</Text>
+        {/* Hidden: long-press the title to open the RevenueCat debug screen. */}
+        <Pressable onLongPress={() => router.push('/debug')} delayLongPress={1500}>
+          <Text style={styles.brand}>🫙 JarUp</Text>
         </Pressable>
+        {locked && (
+          <Pressable style={styles.goProButton} onPress={() => router.push('/paywall')}>
+            <Text style={styles.goProText}>Go Pro</Text>
+          </Pressable>
+        )}
+        {isPro && (
+          <View style={styles.proChip} accessibilityLabel="JarUp Pro active">
+            <Text style={styles.proChipText}>Pro ✓</Text>
+          </View>
+        )}
       </View>
 
       <Pressable style={styles.hero} onPress={() => router.push('/sip')}>
@@ -41,18 +53,20 @@ export default function Home() {
       <Text style={styles.sectionLabel}>Calculators</Text>
       <View style={styles.grid}>
         {TILES.map((t) => (
-          <Link key={t.href} href={t.href} asChild>
-            <Pressable style={styles.tile}>
-              {t.pro && <ProBadge />}
-              <View style={styles.dotsRow}>
-                {t.dots.map((c, i) => (
-                  <View key={i} style={[styles.dot, { backgroundColor: c, marginLeft: i === 0 ? 0 : -8 }]} />
-                ))}
-              </View>
-              <Text style={styles.tileTitle}>{t.title}</Text>
-              <Text style={styles.tileSubtitle}>{t.subtitle}</Text>
-            </Pressable>
-          </Link>
+          <Pressable
+            key={t.href}
+            style={styles.tile}
+            onPress={() => (t.pro ? requirePro(t.title, () => router.push(t.href)) : router.push(t.href))}
+          >
+            {t.pro && <ProBadge />}
+            <View style={styles.dotsRow}>
+              {t.dots.map((c, i) => (
+                <View key={i} style={[styles.dot, { backgroundColor: c, marginLeft: i === 0 ? 0 : -8 }]} />
+              ))}
+            </View>
+            <Text style={styles.tileTitle}>{t.title}</Text>
+            <Text style={styles.tileSubtitle}>{t.subtitle}</Text>
+          </Pressable>
         ))}
       </View>
 
@@ -67,6 +81,8 @@ const styles = StyleSheet.create({
   brand: { color: colors.text, fontSize: 20, fontWeight: '900' },
   goProButton: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 7 },
   goProText: { color: colors.gold, fontWeight: '800', fontSize: 12 },
+  proChip: { backgroundColor: colors.gold + '22', borderWidth: 1, borderColor: colors.gold + '66', borderRadius: 14, paddingHorizontal: 12, paddingVertical: 7 },
+  proChipText: { color: colors.gold, fontWeight: '900', fontSize: 12 },
   hero: {
     backgroundColor: colors.card,
     borderWidth: 1,

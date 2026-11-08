@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 9.1.0"
+    "version": ">= 9.1.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -20,12 +21,22 @@
     },
     "production": {
       "node": "24.22.2",
+      "autoIncrement": true,
+      "ios": {
+        "resourceClass": "m-medium"
+      },
       "env": {
-        "ORG_GRADLE_PROJECT_reactNativeArchitectures": "arm64-v8a"
+        "ORG_GRADLE_PROJECT_reactNativeArchitectures": "arm64-v8a",
+        "EXPO_PUBLIC_RC_IOS_KEY": "REPLACE_WITH_appl_KEY"
       }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascAppId": "6831490355",
+        "appleTeamId": "REPLACE_WITH_TEAM_ID"
+      }
+    }
   }
 }

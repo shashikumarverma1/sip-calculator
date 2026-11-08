@@ -18,16 +18,19 @@
     "build:prod:android": "eas build -p android --profile production",
     "build:submit:prod:android": "eas submit --platform android --profile production",
     "build:prod:ios": "eas build --platform ios --profile production",
-    "eas:secret": "eas env:push production --path .env --force"
+    "eas:secret": "eas env:push production --path .env --force",
+    "postinstall": "patch-package"
   },
   "jest": {
     "preset": "jest-expo"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/slider": "5.2.1",
     "@shopify/react-native-skia": "2.14.0",
     "expo": "^58.0.21",
+    "expo-clipboard": "~58.0.4",
     "expo-constants": "~58.0.14",
     "expo-font": "~58.0.11",
     "expo-haptics": "~58.0.7",
@@ -44,6 +47,7 @@
     "react-dom": "19.3.0",
     "react-native": "0.88.1",
     "react-native-gesture-handler": "~3.3.0",
+    "react-native-purchases": "^11.0.1",
     "react-native-reanimated": "4.7.1",
     "react-native-safe-area-context": "~5.11.1",
     "react-native-screens": "~4.30.0",
@@ -61,6 +65,7 @@
     "@types/react-test-renderer": "^18.0.7",
     "jest": "^30.0.0",
     "jest-expo": "~58.0.13",
+    "patch-package": "8.0.1",
     "react-test-renderer": "^19.0.0",
     "typescript": "~6.0.3"
   },

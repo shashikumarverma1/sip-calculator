@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { router } from 'expo-router';
+import { useProGate, showComingSoon } from '@/lib/subscription/useProGate';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/ui/Screen';
 import { colors } from '@/components/ui/theme';
@@ -34,6 +35,7 @@ function buildJar(breakdown: YearBreakdown[]): JarState {
 }
 
 export default function SipScreen() {
+  const { locked, requirePro } = useProGate();
   const [phase, setPhase] = useState<Phase>('setup');
   const [monthly, setMonthly] = useState(5000);
   const [ratePct, setRatePct] = useState(11);
@@ -220,14 +222,16 @@ export default function SipScreen() {
           <Slider minimumValue={1} maximumValue={50} step={1} value={years} minimumTrackTintColor={colors.gold} onValueChange={setYears} style={styles.fineSlider} />
         </View>
 
-        <Pressable style={styles.proRow} onPress={() => router.push('/paywall')}>
+        <Pressable style={styles.proRow} onPress={() => requirePro('Step-up SIP', () => showComingSoon('Step-up SIP'))}>
           <View>
             <Text style={styles.proRowTitle}>Step-up every year</Text>
             <Text style={styles.proRowSubtitle}>Grow your SIP with your salary</Text>
           </View>
-          <View style={styles.proBadgeSmall}>
-            <Text style={styles.proBadgeSmallText}>🔒 PRO</Text>
-          </View>
+          {locked && (
+            <View style={styles.proBadgeSmall}>
+              <Text style={styles.proBadgeSmallText}>🔒 PRO</Text>
+            </View>
+          )}
         </Pressable>
 
         <Text style={styles.previewHint}>Jar will hold about {formatINR(previewFV.total)} — watch it fill</Text>
@@ -439,11 +443,11 @@ export default function SipScreen() {
         <Pressable style={styles.proActionButton}>
           <Text style={styles.proActionText}>💾 Save plan</Text>
         </Pressable>
-        <Pressable style={styles.proActionButton} onPress={() => router.push('/paywall')}>
-          <Text style={styles.proActionText}>⇄ vs FD · PRO</Text>
+        <Pressable style={styles.proActionButton} onPress={() => requirePro('SIP vs FD', () => router.push('/compare'))}>
+          <Text style={styles.proActionText}>⇄ vs FD{locked ? ' · PRO' : ''}</Text>
         </Pressable>
-        <Pressable style={styles.proActionButton} onPress={() => router.push('/paywall')}>
-          <Text style={styles.proActionText}>📈 Step-up · PRO</Text>
+        <Pressable style={styles.proActionButton} onPress={() => requirePro('Step-up SIP', () => showComingSoon('Step-up SIP'))}>
+          <Text style={styles.proActionText}>📈 Step-up{locked ? ' · PRO' : ''}</Text>
         </Pressable>
       </View>
 

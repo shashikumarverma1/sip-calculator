@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { router } from 'expo-router';
+import { useProGate } from '@/lib/subscription/useProGate';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/ui/Screen';
 import { colors } from '@/components/ui/theme';
@@ -89,6 +90,7 @@ function interestOnlyJar(amount: number): JarState {
 }
 
 export default function EmiScreen() {
+  const { locked, requirePro } = useProGate();
   const [phase, setPhase] = useState<Phase>('setup');
   const [loanType, setLoanType] = useState<LoanType>('Home');
   const [principal, setPrincipal] = useState(2000000);
@@ -629,11 +631,13 @@ export default function EmiScreen() {
         )}
       </View>
 
-      <Pressable style={styles.planLink} onPress={() => setPhase('prepay')}>
+      <Pressable style={styles.planLink} onPress={() => requirePro('Prepayment planner', () => setPhase('prepay'))}>
         <Text style={styles.planLinkText}>Plan my own prepayments</Text>
-        <View style={styles.proBadgeSmall}>
-          <Text style={styles.proBadgeSmallText}>PRO</Text>
-        </View>
+        {locked && (
+          <View style={styles.proBadgeSmall}>
+            <Text style={styles.proBadgeSmallText}>PRO</Text>
+          </View>
+        )}
       </Pressable>
 
       <View style={styles.bottomActionsRow}>

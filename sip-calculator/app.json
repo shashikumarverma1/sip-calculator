@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "JarUp",
+    "name": "JarUp (SIP/EMI Calculator)",
     "slug": "sip-calculator",
     "version": "1.0.0",
     "scheme": "jarup",
@@ -11,16 +11,24 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.shashi.SipCalculator"
+      "supportsTablet": false,
+      "bundleIdentifier": "com.SipCalculator.app",
+      "version": "1.0",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0f1420"
+        "backgroundColor": "#0a6550"
       },
       "package": "com.SipCalculator.app",
-      "versionCode": 2,
+      "permissions": [
+        "com.android.vending.BILLING"
+      ],
+      "versionCode": 3,
       "blockedPermissions": [
         "android.permission.ACTIVITY_RECOGNITION",
         "android.permission.BODY_SENSORS",
@@ -52,13 +60,15 @@
         "expo-splash-screen",
         {
           "image": "./assets/splash.png",
+          "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#0f1420"
+          "backgroundColor": "#04382d"
         }
       ],
       "expo-status-bar",
       "expo-web-browser",
-      "./plugins/withGradleMemory"
+      "./plugins/withGradleMemory",
+      "./plugins/withRevenueCatPods"
     ],
     "owner": "shashikumarverma"
   }
